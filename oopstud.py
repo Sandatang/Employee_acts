@@ -65,8 +65,7 @@ def generatePayroll():
         for i in emp_payroll:
             k=[i.idno,i.name,i.position,i.totalsalary]
             data.append(k)
-    # print(tabulate(data, headers=total_sal))
-    print
+    print(tabulate(data, headers=total_sal))
 
     input("\nNo more data available. Press enter to continue..")
     
