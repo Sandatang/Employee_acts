@@ -1,19 +1,15 @@
 class Person(object):
-    def __init__(self,lastname:str,firstname:str)->None:
-        self.lastname = lastname
-        self.firstname = firstname
+    def __init__(self,name:str)->None:
+        self.name = name
     def __str__(self)->str:
-            return f"{self.lastname} {self.firstname}"
+            return f"{self.name}"
 
-class Student(Person):
-    def __init__(self,idno:str,lastname:str,firstname:str,course:str,level:str)->None:
-        super().__init__(lastname,firstname)
+class Employee(Person):
+    def __init__(self,idno:str,name:str,position:str,totalsalary:float)->None:
+        super().__init__(name)
         self.idno=idno
-        self.course=course
-        self.level=level
+        self.position=position
+        self.totalsalary=totalsalary
     
     def __str__(self)->str:
-        return f"{self.idno} {super().__str__()} {self.course} {self.level}"
-
-    def __eq__(self,idno)->bool:
-        return self.idno == idno
+        return f"{self.idno},{super().__str__()},{self.position},{self.totalsalary}"

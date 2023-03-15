@@ -1,126 +1,99 @@
 import os
-from Oop import Student
+from Oop import Employee
 from outhandler import outputHandler
 import filehandler
 import pwinput
 from tabulate import tabulate
 
-col:list=["Idno","Lastname","Firstname","Course","Level"]
-student:list= []
+total_sal:list=["IDNO","NAME","POSITION","TOTAL SALARY"]
+per_day:list=["IDNO","NAME","POSITION","SALARY PER DAY"]
+emp_payroll:list= []
 isChanged = False
-def addstudent():
+
+def finder(idno):
+
+    isfound=False
+    getData = filehandler.loadlist()
+    if getData:
+        for i in getData:
+            if i[0] == idno:
+                isfound=True
+                os.system("clear" if os.name=="posix" else "cls")
+                outputHandler("Found",i[0],i[1],i[2],i[3])
+                return i
+    
+    if not(isfound):
+        print("\nEmployee doesn't exist!")
+
+def addNumWorked():
 
     os.system("clear" if os.name=="posix" else "cls")
-    print("Add Student")
-    idno:str=input("Idno       :")
-    lastname:str=input("Lastname   :")
-    firstname:str=input("Firstname  :")
-    course:str=input("Course     :")
-    level:str=input("Level      :")
-    student.append(Student(idno,lastname,firstname,course,level))
+    print("Add worked day(s)\n---------------------")
+    idno=input("IDNO    : ")
 
-    input("Student added. Press enter key to continue...")
+    fee_emp:list=finder(idno)
 
-def findstudent():
-    getData = filehandler.loadlist()
+    if fee_emp:
+        days_work:int = int(input("\nEnter day(s) worked : "))
+        name = fee_emp[1]
+        position = fee_emp[2]
+        salary = fee_emp[3]
+        totalsalary = f'{float(salary) * days_work:.2f}'
+        emp_payroll.append(Employee(idno,name,position,totalsalary))
+        print("{:<{}}".format("Total salary",19)+ " : " +"{:<{}}".format(totalsalary,17))
+        input("----------------------------------------\nPress enter to continue...")
+    else: input("\nPress enter to continue...")
+
+def findEmployee():
     os.system("clear" if os.name=="posix" else "cls")
     print("Find Student\n--------------------")
     idno=input("Idno: ")
-    isfound=False
 
-    if student:
-        for i in student:
-            if i.idno == idno:
-                isfound=True
-                os.system("clear" if os.name=="posix" else "cls")
-                outputHandler("Found",i.idno,i.lastname,i.firstname,i.course,i.level)
-                input("Press enter to continuee..")
-    if getData:
-        # data=[]
-        for i in getData:
-            for j in i:
-                k = j.replace('[','').replace(']','').replace("'",'')
-                if k == idno:
-                    isfound=True
-                    os.system("clear" if os.name=="posix" else "cls")
-                    outputHandler("Found",k,i[1].strip().replace("'",''),i[2].strip().replace("'",''),i[3].strip().replace("'",''),i[4].strip().replace("]",'').replace("'",''))
-                    input("Press enter to continuee..")
-    if not(isfound):
-        input("\nNo records!. \n\nPress enter to continue..")
+    finder(idno)
+    input("\nPress enter to continue...")
 
-def deletestudent():
-    getData = filehandler.loadlist()
+def generatePayroll():
+    payroll_data = filehandler.generatepay()
     os.system("clear" if os.name=="posix" else "cls")
-    print("Delete Student\n-----------------------")
-    idno=input("Idno: ")
-    isfound=False
+    data=[]
+
+    if payroll_data:
+        for i in payroll_data:
+            data.append(i)
+
+    if emp_payroll:
+        for i in emp_payroll:
+            k=[i.idno,i.name,i.position,i.totalsalary]
+            data.append(k)
+    print(tabulate(data, headers=total_sal))
     
-    if student:
-        for i in student:
-            if i.idno == idno:
-                isfound=True
-                os.system("clear" if os.name=="posix" else "cls")
-                outputHandler("Deletion",i.idno,i.lastname,i.firstname,i.course,i.level)
-                todel = input("Do you want to remove this student (y/n)?: ")
-                if todel == 'y':
-                    student.remove(i)
-                    os.system("clear")
-                    input("\nStudent deleted. Press enter to continue..")
-                else:input("Operation cancelled!. Press enter to continue..")
-    if getData:
-        for i in getData:
-            for j in i:
-                k = j.replace('[','').replace(']','').replace("'",'')
-                if k == idno:
-                    isfound=True
-                    os.system("clear" if os.name=="posix" else "cls")
-                    outputHandler("Deletion",k,i[1].strip().replace("'",''),i[2].strip().replace("'",''),i[3].strip().replace("'",''),i[4].strip().replace("]",'').replace("'",''))
+    input("\nNo more data available. Press enter to continue..")
+    
+    
 
-                    todel = input("Do you want to remove this student (y/n)?: ")
-                    if todel == 'y':
-                        filehandler.delete(idno)
-                        isChanged=True
-                        # importlib.reload(filehandler)
-                        # getData = ''
-                        input("\nStudent deleted. Press enter to continue..")
-                    else:input("\nOperation cancelled!. Press enter to continue..")
-
-    if not(isfound):
-        input("\nNo records! \n\nPress enter to continue..")
-
-def displaystudent():
+def displayallEmployee():
     getData = filehandler.loadlist()
     os.system("clear" if os.name=="posix" else "cls")
     print("Display Students\n--------------------------------")
     data = []
     if getData:
-        for i in getData:
-            emptylist=[]
-            for j in i:
-                k = j.replace('[','').replace(']','').replace("'",'')
-                emptylist.append(k)
-            data.append(emptylist)
-    if student:
-        for i in student:
-            data.append([i.idno,i.lastname,i.firstname,i.course,i.level])
-    if data:
-        print(tabulate(data, headers=col))
+        print(tabulate(getData, headers=per_day))
     else: print("No records!\n")
-    input("Press enter to continue...")
+    input("\nPress enter to continue...")
 
 def exit():
 
     os.system("clear" if os.name=="posix" else "cls")
-    filehandler.saveit(student)
+    filehandler.saveit(emp_payroll)
     print("Program Terminated")
 
 def getOption(option:int)->str:
 
     options:dict={
-        1:addstudent,
-        2:findstudent,
-        3:deletestudent,
-        4:displaystudent,
+        1:findEmployee,
+        2:displayallEmployee,
+        3:addNumWorked,
+        4:generatePayroll,
         0:exit
     }
     return options.get(option)()
@@ -129,10 +102,10 @@ def menu():
 
     os.system("clear" if os.name == "posix" else "cls")
     menu:tuple=(
-        "1. Add Student",
-        "2. Find Student",
-        "3. Delete Student",
-        "4. Display All Student",
+        "1. Find Employee",
+        "2. Display All Employee",
+        "3. Add numbers of days(s) worked",
+        "4. Generate Payroll",
         "0. Quit/Exit",
         "-----------------------"
     )
@@ -156,11 +129,11 @@ def main()->None:
     if autheticated:
         while option !=0:
             menu()
-            # try:
-            option:int=int(input("Enter option (0..4):"))
-            getOption(option)
-            # except:
-            #     input("Invalid Input.")
+            try:
+                option:int=int(input("Enter option (0..4):"))
+                getOption(option)
+            except:
+                input("Invalid Input.")
     else: os.system("clear" if os.name=="posix" else "cls"),print("Invalid login. Please log in again")
 if __name__ == "__main__":
     main()
